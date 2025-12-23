@@ -1,14 +1,21 @@
 // Start by installing the project with `npm install`
 // Set your connection string in the `.env` file
 // Set up your schema.prisma file
-// Generate the client with `npx prisma generate` (optional)
-// Update the database with with `npx prisma migrate dev` (That will also generate the client again)
+// Generate the client with `npx prisma generate`
+// Update the database with with `npx prisma migrate dev`
 // Run the app with `npm run start`
 
 import { input, select } from "@inquirer/prompts";
 import { PrismaClient } from "./generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+const connectionString = `${process.env.DATABASE_URL}`;
+if (!connectionString) {
+  throw new Error('Could not find "DATABASE_URL" in your .env file');
+}
+
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 async function addMovie(): Promise<void> {
   // Expected:
