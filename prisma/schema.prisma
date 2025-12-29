@@ -7,4 +7,40 @@ datasource db {
   provider = "postgresql"
 }
 
-// your models go here
+model Movie {
+  id          Int          @id @default(autoincrement())
+  title       String       @db.VarChar(255)
+  year        Int
+  description String?      @db.Text
+  createdAt   DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(3)
+  genres      MovieGenre[]
+
+  @@index([title])
+  @@index([year])
+  @@index([createdAt])
+  @@map("movies")
+}
+
+model Genre {
+  id        Int          @id @default(autoincrement())
+  name      String       @unique @db.VarChar(100)
+  createdAt DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime     @updatedAt @db.Timestamptz(3)
+  movies    MovieGenre[]
+
+  @@index([name])
+  @@map("genres")
+}
+
+model MovieGenre {
+  movieId Int
+  genreId Int
+  movie   Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  genre   Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, genreId])
+  @@index([genreId])
+  @@index([movieId])
+  @@map("movie_genres")
+}
